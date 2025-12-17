@@ -1,0 +1,53 @@
+/* 教师端总体布局（与学生端风格一致，配色略有区别） */
+.tea-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.tea-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: linear-gradient(135deg, #1c7ed6 0%, #845ef7 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.15);
+}
+
+.tea-header .brand { display:flex; align-items:center; gap:10px; }
+.tea-header .logo { font-size: 20px; }
+.tea-header .title { font-weight: 700; letter-spacing: .5px; }
+
+.tabs { display:flex; gap:10px; justify-content:center; }
+.tab { padding:8px 14px; border-radius:999px; color:#f1eaff; text-decoration:none; font-weight:600; transition: all .2s ease; }
+.tab:hover { background: rgba(255,255,255,.18); }
+.tab.active { background: rgba(255,255,255,.30); color:#fff; }
+
+.userbox { display:flex; align-items:center; gap:12px; justify-content:end; }
+.userbox .logout { padding:8px 12px; border:none; border-radius:8px; background:#ff6b6b; color:#fff; font-weight:600; cursor:pointer; }
+.userbox .logout:hover { background:#ee5253; }
+
+.tea-main { padding:20px; max-width:1200px; margin:0 auto; }
+
+/* 通用卡片/按钮/网格（复用学生端视觉） */
+.card { background:#fff; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:16px; }
+.card-head { font-weight:700; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.grid.two { display:grid; grid-template-columns: 1.2fr 1fr; gap:18px; }
+.grid.three { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
+@media (max-width: 900px) { .grid.two, .grid.three { grid-template-columns:1fr; } }
+
+.btn { padding: 10px 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
+.btn.primary { background: linear-gradient(135deg, #1c7ed6, #845ef7); color: #fff; }
+.btn.ghost { background: #f1f3f5; color: #343a40; }
+
+.input, input, select, textarea { padding: 10px 12px; border: 1px solid #dee2e6; border-radius: 10px; }
+textarea { width:100%; min-height: 100px; }
+
+.note { font-size:12px; color:#868e96; }
+

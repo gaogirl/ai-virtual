@@ -1,0 +1,8 @@
+/* AIChat 组件样式（可按需调整主题） */
+.ai-chat-wrap { }
+.ai-chat-header { }
+.ai-chat-output { }
+.ai-chat-input { }
+.ai-chat-error { color:#b00020; }
+
+
