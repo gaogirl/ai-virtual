@@ -29,13 +29,18 @@ const uploadRoutes = require('./routes/api/upload');
 const app = express();
 
 // 中间件
-app.use(cors({
+// 配置CORS
+const corsOptions = {
   origin: [
     process.env.CLIENT_URL || 'http://localhost:5173',
-    'https://gaogirl.github.io' // 添加GitHub Pages域名
+    'https://gaogirl.github.io'
   ],
-  credentials: true
-}));
+  credentials: true, // 允许发送cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -73,5 +78,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`服务器正在端口 ${PORT} 上运行`);
 });
+
 
 
