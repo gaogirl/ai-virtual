@@ -6,7 +6,14 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 // 加载环境变量
+console.log('正在加载环境变量...');
 dotenv.config();
+
+// 调试环境变量
+console.log('环境变量加载结果:');
+console.log('MONGO_URI是否存在:', process.env.MONGO_URI ? '是' : '否');
+console.log('CLIENT_URL是否存在:', process.env.CLIENT_URL ? '是' : '否');
+console.log('ZHIPU_API_KEY是否存在:', process.env.ZHIPU_API_KEY ? '是' : '否');
 
 // 导入路由
 const auth = require('./routes/api/auth');
@@ -23,7 +30,10 @@ const app = express();
 
 // 中间件
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:5173',
+    'https://gaogirl.github.io' // 添加GitHub Pages域名
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -31,6 +41,7 @@ app.use(cookieParser());
 
 // 数据库配置
 const db = process.env.MONGO_URI;
+console.log('数据库连接URI:', db);
 
 // 连接到 MongoDB
 mongoose
@@ -62,3 +73,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`服务器正在端口 ${PORT} 上运行`);
 });
+
+

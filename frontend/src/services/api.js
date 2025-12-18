@@ -30,6 +30,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // 处理网络错误
+    if (!error.response) {
+      console.error('网络错误：无法连接到服务器。这可能是因为您正在GitHub Pages上访问应用，而后端服务器仅在本地运行。');
+      // 可以在这里添加一些用户友好的提示
+    }
+
     const token = localStorage.getItem('token');
     // 若是本地模式（local- 开头的 token），不要因 401 强制跳转
     if (error.response?.status === 401 && !(token && token.startsWith('local-'))) {
@@ -72,3 +78,4 @@ export const coursesAPI = {
 export default api;
 
 
+
