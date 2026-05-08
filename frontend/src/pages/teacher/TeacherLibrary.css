@@ -1,0 +1,20 @@
+/* 教师端 术语库/案例库 样式 */
+.page-narrow { max-width: 1100px; margin: 0 auto; }
+.searchbar { display:flex; gap:10px; align-items:center; padding:8px 12px; background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.06); }
+.searchbar input, .searchbar textarea { flex:1; padding:10px 12px; border:1px solid #e9ecef; border-radius:8px; }
+
+.chips { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+.chip { padding:6px 12px; border-radius:999px; background:#f1f3f5; cursor:pointer; }
+.chip.active { background:#e0e7ff; color:#1c7ed6; font-weight:700; }
+
+.cards { display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; }
+.cardX { background:#fff; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:14px; }
+.cardX .title { font-weight:800; margin-bottom:6px; }
+.cardX .meta { color:#868e96; font-size:12px; }
+.row { display:flex; gap:8px; }
+.actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.btn { padding: 8px 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
+.btn.primary { background: linear-gradient(135deg, #1c7ed6, #845ef7); color:#fff; }
+.btn.ghost { background:#f1f3f5; }
+.note { font-size:12px; color:#868e96; }
+

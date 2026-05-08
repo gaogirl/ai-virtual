@@ -1,0 +1,417 @@
+/* General container for the full-page layout */
+.register-container {
+    position: fixed; /* 占满整个窗口 */
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    padding: 20px;
+    overflow: auto; /* 窗口内容滚动 */
+    margin: 0;
+}
+
+/* 注册内容容器（透明化，让整页渐变可见） */
+.register-content {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    min-height: 700px;
+    background: transparent; /* 关键：显示外层渐变 */
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+/* 左侧欢迎区域 */
+.register-left {
+    flex: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-left::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.register-left::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -30%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(30px);
+    }
+}
+
+.register-welcome {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.register-welcome h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.register-welcome p {
+    font-size: 18px;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.welcome-features {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(10px);
+}
+
+.feature-icon {
+    font-size: 28px;
+}
+
+.feature-item span:last-child {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* 右侧注册表单区域 */
+.register-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 147, 251, 0.05) 100%);
+    overflow-y: auto;
+}
+
+/* The main register box */
+.register-box {
+    width: 100%;
+    max-width: 380px;
+}
+
+.register-box h2 {
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Input fields styling */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.input-group input::placeholder {
+    color: #999;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: rgba(102, 126, 234, 0.02);
+}
+
+.input-group input:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Role selection styling */
+.role-selection {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 10px;
+}
+
+.role-selection label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.role-selection label:hover {
+    color: #667eea;
+}
+
+.role-selection input[type="radio"] {
+    margin-right: 8px;
+    accent-color: #667eea;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.role-selection input[type="radio"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Submit button styling */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Sub-text for login link */
+.sub-text {
+    margin-top: 25px;
+    color: #666;
+    text-align: center;
+    font-size: 14px;
+}
+
+.sub-text a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+}
+
+.sub-text a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Error message styling */
+.error-message {
+    color: #d32f2f;
+    background-color: #ffebee;
+    border: 1px solid #ef5350;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .register-content {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .register-left {
+        padding: 30px 20px;
+        min-height: 250px;
+    }
+
+    .register-welcome h1 {
+        font-size: 32px;
+    }
+
+    .register-welcome p {
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    .welcome-features {
+        gap: 15px;
+    }
+
+    .feature-item {
+        padding: 12px;
+    }
+
+    .register-right {
+        padding: 30px 20px;
+    }
+
+    .register-box {
+        max-width: 100%;
+    }
+
+    .role-selection {
+        gap: 20px;
+        padding: 15px;
+    }
+
+    .role-selection label {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-container {
+        padding: 10px;
+    }
+
+    .register-content {
+        border-radius: 15px;
+        min-height: auto;
+    }
+
+    .register-left {
+        padding: 20px;
+        min-height: 200px;
+    }
+
+    .register-welcome h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .register-welcome p {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .welcome-features {
+        gap: 12px;
+    }
+
+    .feature-item {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .feature-icon {
+        font-size: 20px;
+    }
+
+    .register-right {
+        padding: 20px;
+    }
+
+    .register-box h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    .role-selection {
+        gap: 15px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+
+    .role-selection label {
+        font-size: 13px;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
+    .input-group input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .sub-text {
+        font-size: 12px;
+        margin-top: 20px;
+    }
+}
