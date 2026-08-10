@@ -16,6 +16,7 @@ import TeacherClasses from './pages/TeacherClasses';
 import TeacherClassDetail from './pages/TeacherClassDetail';
 import TeacherAssignments from './pages/teacher/TeacherAssignments';
 import TeacherAnalytics from './pages/teacher/TeacherAnalytics';
+import TeacherCourseGenerator from './pages/teacher/TeacherCourseGenerator';
 import TeacherAssignmentSubmissions from './pages/teacher/TeacherAssignmentSubmissions';
 import TeacherSubmissionDetail from './pages/teacher/TeacherSubmissionDetail';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -28,6 +29,7 @@ import StudentClasses from './pages/student/StudentClasses';
 import StudentClassDetail from './pages/student/StudentClassDetail';
 import StudentAssignmentDetail from './pages/student/StudentAssignmentDetail';
 import StudentAIInterpret from './pages/student/StudentAIInterpret';
+import StudentVRLab from './pages/student/StudentVRLab';
 import './App.css';
 
 function App() {
@@ -48,6 +50,7 @@ function App() {
               <Route index element={<StudentHome />} />
               <Route path="ai" element={<StudentAIChat />} />
               <Route path="ai-interp" element={<StudentAIInterpret />} />
+              <Route path="vr-lab" element={<StudentVRLab />} />
               <Route path="terms" element={<StudentTerms />} />
               <Route path="cases" element={<StudentCases />} />
               <Route path="cases/:id" element={<StudentCaseDetail />} />
@@ -72,6 +75,7 @@ function App() {
               <Route path="assignments/:aid/submissions" element={<TeacherAssignmentSubmissions />} />
               <Route path="submissions/:sid" element={<TeacherSubmissionDetail />} />
               <Route path="analytics" element={<TeacherAnalytics />} />
+              <Route path="course-generator" element={<TeacherCourseGenerator />} />
               <Route path="terms" element={<TeacherTerms />} />
               <Route path="cases" element={<TeacherCases />} />
             </Route>

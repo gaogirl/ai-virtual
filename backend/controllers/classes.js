@@ -1,5 +1,6 @@
 const Class = require('../models/Class');
 const Assignment = require('../models/Assignment');
+const Submission = require('../models/Submission');
 const mongoose = require('mongoose');
 
 function genInviteCode(len = 6) {
@@ -264,14 +265,34 @@ exports.dashboard = async (req, res) => {
     if (String(cls.teacher) !== String(req.user._id)) return res.status(403).json({ error: '无权访问' });
 
     const membersCount = (cls.members || []).length;
-    const assignmentsCount = await Assignment.countDocuments({ class: id });
+    const assignments = await Assignment.find({ class: id }).select('_id').lean();
+    const assignmentsCount = assignments.length;
+    const submissions = assignments.length
+      ? await Submission.find({ assignment: { $in: assignments.map(a => a._id) } }).select('totalScore answers comment').lean()
+      : [];
+    const expected = membersCount * assignmentsCount;
+    const completionRate = expected ? Math.min(1, submissions.length / expected) : 0;
+    const scored = submissions.map(s => s.totalScore).filter(n => typeof n === 'number');
+    const averageScore = scored.length ? Math.round(scored.reduce((sum, n) => sum + n, 0) / scored.length) : 0;
+    const mistakeRules = [
+      ['术语使用', /术语|terminology|term/i], ['准确性', /准确|accuracy|incorrect|误译/i],
+      ['语法', /语法|grammar|grammatical/i], ['流畅度', /流畅|fluency/i],
+      ['遗漏信息', /遗漏|漏译|omission|missing/i], ['发音', /发音|pronunciation/i],
+    ];
+    const mistakeCounts = new Map();
+    submissions.forEach(s => {
+      const feedback = [(s.comment || ''), ...(s.answers || []).map(a => a.feedback || '')].join(' ');
+      mistakeRules.forEach(([label, pattern]) => { if (pattern.test(feedback)) mistakeCounts.set(label, (mistakeCounts.get(label) || 0) + 1); });
+    });
+    const commonMistakes = [...mistakeCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([label, count]) => `${label} (${count})`);
 
     res.json({
       membersCount,
       assignmentsCount,
-      completionRate: 0,
-      averageScore: 0,
-      commonMistakes: [],
+      completionRate,
+      averageScore,
+      gradedCount: scored.length,
+      commonMistakes,
     });
   } catch (e) {
     console.error('dashboard error', e);

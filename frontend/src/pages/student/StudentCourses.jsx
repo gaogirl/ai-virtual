@@ -56,6 +56,10 @@ export default function StudentCourses() {
             <div className="card-head"><span>案例库</span></div>
             <div className="note">浏览案例，查看详情与背景资料</div>
           </Link>
+          <Link className="card" to="/student/vr-lab" style={{ textDecoration:'none' }}>
+            <div className="card-head"><span>沉浸式情景模拟</span></div>
+            <div className="note">进入会议、谈判与发布会口译训练台</div>
+          </Link>
         </div>
       </div>
 

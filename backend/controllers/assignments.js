@@ -128,9 +128,17 @@ exports.detail = async (req, res) => {
     const isMember = (cls.members || []).some(m => String(m) === String(req.user._id)) || String(cls.teacher) === String(req.user._id);
     if (!isMember) return res.status(403).json({ error: '无权访问' });
 
+    const mySubmission = req.user.role === 'student'
+      ? await Submission.findOne({ assignment: id, student: req.user._id })
+        .select('attempts status totalScore')
+        .lean()
+      : null;
+
+    const canViewReference = req.user.role === 'teacher' || a.allowViewRef === true;
     const questions = (a.questions || []).map(q => ({
       type: q.type,
       promptText: q.promptText,
+      ...(canViewReference && q.referenceAnswer ? { referenceAnswer: q.referenceAnswer } : {}),
       difficulty: q.difficulty,
       topic: q.topic,
       knowledgeTags: q.knowledgeTags,
@@ -144,6 +152,7 @@ exports.detail = async (req, res) => {
       dueAt: a.dueAt,
       retryLimit: a.retryLimit,
       allowViewRef: a.allowViewRef,
+      mySubmission,
       questions,
       termIds: a.termIds || [],
       caseIds: a.caseIds || [],
@@ -166,7 +175,15 @@ exports.submit = async (req, res) => {
     const cls = await Class.findById(a.class);
     const isMember = (cls.members || []).some(m => String(m) === String(req.user._id));
     if (!isMember) return res.status(403).json({ error: '非班级成员无法提交' });
-
+    if (a.dueAt && new Date() > new Date(a.dueAt)) {
+      return res.status(400).json({ error: '作业已超过截止时间' });
+    }
+    const existing = await Submission.findOne({ assignment: id, student: req.user._id });
+    const retryLimit = Math.max(1, Number(a.retryLimit) || 1);
+    const usedAttempts = existing ? Math.max(1, existing.attempts || 0) : 0;
+    if (usedAttempts >= retryLimit) {
+      return res.status(400).json({ error: '已达到该作业的最大提交次数', retryLimit, attempts: usedAttempts });
+    }
     // 生成自动初评（仅翻译题）
     const evaluated = [];
     for (let i = 0; i < answers.length; i++) {
@@ -189,7 +206,7 @@ exports.submit = async (req, res) => {
 
     const doc = await Submission.findOneAndUpdate(
       { assignment: id, student: req.user._id },
-      { $set: { answers: evaluated, totalScore, status } },
+      { $set: { answers: evaluated, totalScore, status, attempts: usedAttempts + 1 } },
       { new: true, upsert: true }
     );
 

@@ -1,147 +1,113 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import learningProfileAPI from '../../services/learningProfile';
 import './Student.css';
 
-const AIAssessCard = ({ score = 82 }) => {
-  const level = score >= 85 ? '优秀' : score >= 70 ? '良好' : '待提升';
-  return (
-    <div className="card">
-      <div className="card-head">个人能力 AI 评测</div>
-      <div className="assess-content">
-        <div className="assess-score">
-          <div className="score-num">{score}</div>
-          <div className="score-sub">综合得分</div>
-        </div>
-        <div className="assess-meta">
-          <div>等级：<b>{level}</b></div>
-          <div>优势：<span className="tag ok">信息提炼</span> <span className="tag ok">表达清晰</span></div>
-          <div>建议：术语积累、口语流畅度训练、情景复述</div>
-        </div>
+const typeLabels = {
+  'zh-en': '中译英',
+  'en-zh': '英译中',
+  read: '朗读',
+};
+
+const unwrapProfile = (response) => response?.data?.data || response?.data || response;
+
+const getProfileParts = (profile) => ({
+  summary: profile?.summary || profile?.totals || {},
+  byType: profile?.byType || profile?.directionScores || {},
+  recommendations: profile?.recommendations || profile?.suggestions || [],
+  recentActivity: profile?.recentActivity || [],
+});
+
+const formatDate = (value) => {
+  if (!value) return '';
+  return new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric' }).format(new Date(value));
+};
+
+export default function StudentProfile() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    learningProfileAPI.mine()
+      .then((response) => { if (active) setProfile(unwrapProfile(response)); })
+      .catch((err) => { if (active) setError(err?.response?.data?.error || '学习画像加载失败，请稍后重试'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  if (loading) return <div className="card profile-state">正在生成学习画像…</div>;
+  if (error) return <div className="card profile-state error-state">{error}</div>;
+
+  const { summary, byType, recommendations, recentActivity } = getProfileParts(profile);
+  const submissionCount = summary.submissions ?? summary.submissionCount ?? 0;
+  const gradedCount = summary.graded ?? summary.gradedCount ?? 0;
+  const averageScore = summary.averageScore ?? null;
+  const typeEntries = Object.entries(byType).filter(([, score]) => typeof score === 'number');
+
+  if (!submissionCount) {
+    return (
+      <div className="card profile-state">
+        <div className="card-head">学习画像</div>
+        <strong>完成第一份作业后，这里会形成你的能力画像</strong>
+        <p className="meta">系统会根据真实提交与评分，整理分项能力、近期表现和练习建议。</p>
+        <Link className="btn primary" to="/student/classes">查看班级作业</Link>
       </div>
-    </div>
-  );
-};
-
-// 折线图（学习进度：天/时长）
-const LineChart = ({ data, width = 520, height = 240, padding = 28 }) => {
-  const maxY = Math.max(...data.map(d => d.value), 1);
-  const stepX = (width - padding * 2) / (data.length - 1);
-  const scaleY = (val) => height - padding - (val / maxY) * (height - padding * 2);
-
-  const path = data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${padding + i * stepX} ${scaleY(d.value)}`).join(' ');
+    );
+  }
 
   return (
-    <svg className="svg-box" viewBox={`0 0 ${width} ${height}`}> 
-      {/* 坐标轴 */}
-      <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#e9ecef"/>
-      <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#e9ecef"/>
-      {/* 网格线 */}
-      {[0.25,0.5,0.75,1].map((t,idx)=>{
-        const y = padding + (height - padding*2) * t;
-        return <line key={idx} x1={padding} y1={y} x2={width - padding} y2={y} stroke="#f1f3f5"/>;
-      })}
-      {/* 线条 */}
-      <path d={path} fill="none" stroke="#667eea" strokeWidth={3} />
-      {/* 点 */}
-      {data.map((d,i)=>{
-        const cx = padding + i * stepX, cy = scaleY(d.value);
-        return <g key={i}>
-          <circle cx={cx} cy={cy} r={4} fill="#667eea" />
-          <text x={cx} y={height - padding + 16} textAnchor="middle" fontSize="10" fill="#868e96">{d.label}</text>
-        </g>
-      })}
-      {/* 纵轴最大值标签 */}
-      <text x={padding - 8} y={padding} textAnchor="end" fontSize="10" fill="#868e96">{maxY}</text>
-      <text x={padding - 8} y={height - padding} textAnchor="end" fontSize="10" fill="#868e96">0</text>
-    </svg>
-  );
-};
+    <div className="page profile-page">
+      <section className="profile-summary" aria-label="学习概览">
+        <div><span>综合得分</span><strong>{averageScore ?? '暂无'}</strong></div>
+        <div><span>提交作业</span><strong>{submissionCount}</strong></div>
+        <div><span>已评分</span><strong>{gradedCount}</strong></div>
+      </section>
 
-// 雷达图（话题熟悉度）
-const RadarChart = ({ labels, values, width = 360, height = 300 }) => {
-  const cx = width / 2, cy = height / 2, r = Math.min(width, height) * 0.38;
-  const max = Math.max(...values, 1);
-  const angleStep = (Math.PI * 2) / labels.length;
+      <div className="grid two">
+        <section className="card">
+          <div className="card-head">分项能力</div>
+          {typeEntries.length ? (
+            <div className="ability-list">
+              {typeEntries.map(([type, score]) => (
+                <div className="ability-row" key={type}>
+                  <div><span>{typeLabels[type] || type}</span><strong>{score} 分</strong></div>
+                  <div className="ability-track"><span style={{ width: `${Math.max(0, Math.min(100, score))}%` }} /></div>
+                </div>
+              ))}
+            </div>
+          ) : <div className="profile-empty">作业已有提交，等待教师评分后显示分项能力。</div>}
+        </section>
 
-  const points = values.map((v, i) => {
-    const a = -Math.PI / 2 + angleStep * i; // 从上方开始
-    const rr = (v / max) * r;
-    return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)];
-  });
-
-  const ring = (ratio) => {
-    const pts = labels.map((_, i) => {
-      const a = -Math.PI / 2 + angleStep * i;
-      const rr = r * ratio;
-      return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)];
-    });
-    return pts.map((p,i)=>`${i===0?'M':'L'} ${p[0]} ${p[1]}`).join(' ') + ' Z';
-  };
-
-  const poly = points.map((p,i)=>`${i===0?'M':'L'} ${p[0]} ${p[1]}`).join(' ') + ' Z';
-
-  return (
-    <svg className="svg-box" viewBox={`0 0 ${width} ${height}`}>
-      {/* 环形网格 */}
-      {[0.25,0.5,0.75,1].map((t,i)=> (
-        <path key={i} d={ring(t)} fill="none" stroke="#e9ecef"/>
-      ))}
-      {/* 轴线与标签 */}
-      {labels.map((lab, i)=>{
-        const a = -Math.PI / 2 + angleStep * i;
-        const x = cx + r * Math.cos(a);
-        const y = cy + r * Math.sin(a);
-        return (
-          <g key={i}>
-            <line x1={cx} y1={cy} x2={x} y2={y} stroke="#f1f3f5" />
-            <text x={x} y={y} fontSize="11" fill="#868e96" textAnchor="middle" dy={y<cy?-6:12}>{lab}</text>
-          </g>
-        );
-      })}
-      {/* 多边形 */}
-      <path d={poly} fill="rgba(102,126,234,.25)" stroke="#667eea" strokeWidth={2} />
-    </svg>
-  );
-};
-
-const StudentProfile = () => {
-  // 模拟学习进度数据（近 7 天学习时长，单位：小时）
-  const progress = useMemo(() => ([
-    { label: '周一', value: 1.2 },
-    { label: '周二', value: 0.8 },
-    { label: '周三', value: 1.5 },
-    { label: '周四', value: 2.0 },
-    { label: '周五', value: 0.6 },
-    { label: '周六', value: 1.8 },
-    { label: '周日', value: 2.2 },
-  ]), []);
-
-  const totalDays = progress.filter(p=>p.value>0).length;
-  const totalHours = progress.reduce((s,p)=>s+p.value,0).toFixed(1);
-
-  // 话题熟悉度（0~100）
-  const radarLabels = ['经济','政治','文化','人物','生态','旅游'];
-  const radarValues = [72, 64, 80, 58, 69, 75];
-
-  return (
-    <div className="page">
-      <div className="grid two" style={{marginBottom: 18}}>
-        <div className="card chart-card">
-          <div className="chart-title">学习进度（学习天数 {totalDays} 天 / 总时长 {totalHours} 小时）</div>
-          <LineChart data={progress} />
-        </div>
-        <div className="card chart-card">
-          <div className="chart-title">话题熟悉度</div>
-          <RadarChart labels={radarLabels} values={radarValues} />
-        </div>
+        <section className="card">
+          <div className="card-head">练习建议</div>
+          {recommendations.length ? (
+            <ol className="recommendation-list">
+              {recommendations.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
+            </ol>
+          ) : <div className="profile-empty">当前没有新增建议，继续完成练习以更新画像。</div>}
+        </section>
       </div>
 
-      <AIAssessCard score={84} />
+      <section className="card profile-activity">
+        <div className="card-head">近期学习活动</div>
+        {recentActivity.length ? (
+          <div className="activity-list">
+            {recentActivity.map((item, index) => (
+              <div className="activity-row" key={item.submissionId || `${item.assignmentId}-${index}`}>
+                <div>
+                  <strong>{item.title || '口译作业'}</strong>
+                  <div className="meta">{typeLabels[item.type] || item.type || '综合练习'} · {formatDate(item.updatedAt)}</div>
+                </div>
+                <span className={typeof item.score === 'number' ? 'activity-score' : 'tag'}>
+                  {typeof item.score === 'number' ? `${item.score} 分` : '待评分'}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : <div className="profile-empty">暂无近期活动，去班级完成一份作业吧。</div>}
+      </section>
     </div>
   );
-};
-
-export default StudentProfile;
-
-
-
-
+}

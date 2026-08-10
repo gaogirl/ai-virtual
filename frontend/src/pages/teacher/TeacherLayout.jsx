@@ -24,6 +24,7 @@ export default function TeacherLayout() {
           <NavLink to="/teacher/ai" className={({isActive}) => isActive ? 'tab active' : 'tab'}>智能对话</NavLink>
           <NavLink to="/teacher/classes" className={({isActive}) => isActive ? 'tab active' : 'tab'}>班级管理</NavLink>
           <NavLink to="/teacher/assignments" className={({isActive}) => isActive ? 'tab active' : 'tab'}>作业管理</NavLink>
+          <NavLink to="/teacher/course-generator" className={({isActive}) => isActive ? 'tab active' : 'tab'}>智能备课</NavLink>
           <NavLink to="/teacher/terms" className={({isActive}) => isActive ? 'tab active' : 'tab'}>术语库</NavLink>
           <NavLink to="/teacher/cases" className={({isActive}) => isActive ? 'tab active' : 'tab'}>案例库</NavLink>
           <NavLink to="/teacher/analytics" className={({isActive}) => isActive ? 'tab active' : 'tab'}>数据看板</NavLink>
@@ -39,4 +40,3 @@ export default function TeacherLayout() {
     </div>
   );
 }
-

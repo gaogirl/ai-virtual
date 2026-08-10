@@ -1,12 +1,20 @@
 // AI 对话与翻译前端封装（使用后端代理，避免暴露密钥）
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
 
+const requestHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
 // 流式SSE处理
 async function streamSSE(url, data, onDelta) {
   try {
     const resp = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: requestHeaders(),
       body: JSON.stringify(data)
     });
 
@@ -59,7 +67,7 @@ export async function chatRequest(messages, { model = 'glm-4.5', stream = true, 
     try {
       const resp = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: requestHeaders(),
         body: JSON.stringify({ messages, model, stream: false, temperature })
       });
       if (!resp.ok) throw new Error(await resp.text().catch(()=>'请求失败'));
@@ -77,13 +85,13 @@ export async function chatRequest(messages, { model = 'glm-4.5', stream = true, 
 // 翻译请求
 export async function translateRequest(text, { sourceLanguage = 'auto', targetLanguage = 'zh', model = 'glm-4.5', stream = true } = {}, onDelta) {
   if (stream) {
-    return streamSSE(`${API_BASE}/translate`, { text, sourceLanguage, targetLanguage, model, stream: true }, onDelta);
+    return streamSSE(`${API_BASE}/translate`, { text, sourceLang: sourceLanguage, targetLang: targetLanguage, model, stream: true }, onDelta);
   } else {
     try {
       const resp = await fetch(`${API_BASE}/translate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, sourceLanguage, targetLanguage, model, stream: false })
+        headers: requestHeaders(),
+        body: JSON.stringify({ text, sourceLang: sourceLanguage, targetLang: targetLanguage, model, stream: false })
       });
       if (!resp.ok) throw new Error(await resp.text().catch(()=>'请求失败'));
       return resp.json(); // { translation, raw }
@@ -98,6 +106,3 @@ export async function translateRequest(text, { sourceLanguage = 'auto', targetLa
 }
 
 export { API_BASE };
-
-
-

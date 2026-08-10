@@ -32,14 +32,18 @@ export default function StudentAssignmentDetail() {
           try {
             const tr = await libraryAPI.listTerms({ ids: (d.termIds || []).join(',') });
             setRefTerms((tr.data || tr).list || []);
-          } catch {}
+          } catch {
+            setRefTerms([]);
+          }
         }
         if ((d.caseIds || []).length) {
           try {
             const cr = await libraryAPI.listCases({ ids: (d.caseIds || []).join(',') });
             // listCases 返回精简字段已足够展示
             setRefCases((cr.data || cr).list || []);
-          } catch {}
+          } catch {
+            setRefCases([]);
+          }
         }
       } catch (e) {
         setErr(e?.response?.data?.error || e?.message || '获取作业详情失败');
@@ -50,7 +54,12 @@ export default function StudentAssignmentDetail() {
   const uploadAudio = async (file) => {
     const fd = new FormData();
     fd.append('file', file);
-    const resp = await fetch('/api/upload/audio', { method: 'POST', body: fd });
+    const token = localStorage.getItem('token');
+    const resp = await fetch('/api/upload/audio', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: fd,
+    });
     if (!resp.ok) throw new Error(await resp.text());
     const data = await resp.json();
     return data.url; // /uploads/xxx
@@ -83,10 +92,18 @@ export default function StudentAssignmentDetail() {
               <b>{detail.title}</b> · 类型：{detail.type}
               {detail.dueAt && <span style={{ marginLeft:8 }}>截止：{new Date(detail.dueAt).toLocaleString()}</span>}
             </div>
+            <div className="assignment-policy">
+              <span>最多提交 {detail.retryLimit || 1} 次</span>
+              <span>已提交 {detail.mySubmission?.attempts || 0} 次</span>
+              <span>{detail.allowViewRef ? '可查看参考答案' : '参考答案暂不公开'}</span>
+            </div>
             {(detail.questions || []).map((q, idx) => (
               <div key={idx} className="card" style={{ marginBottom: 8 }}>
                 <div className="card-head"><span>第 {idx+1} 题（{q.type}）</span></div>
                 <div style={{ whiteSpace:'pre-wrap', marginBottom:8 }}>{q.promptText}</div>
+                {q.referenceAnswer && (
+                  <div className="reference-answer"><b>参考答案：</b>{q.referenceAnswer}</div>
+                )}
                 {q.type === 'read' ? (
                   <div>
                     <div className="note" style={{ color:'#555' }}>请录音并上传音频文件（wav/mp3 等，文件大小受服务器限制）。</div>

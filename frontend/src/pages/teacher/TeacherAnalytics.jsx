@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import classesAPI from '../../services/classes';
 import './Teacher.css';
 
@@ -15,14 +16,14 @@ export default function TeacherAnalytics() {
         const res = await classesAPI.teaching();
         const data = res.data || res;
         setClasses(data || []);
-        if ((data || []).length && !classId) setClassId(String(data[0]._id));
+        if ((data || []).length) setClassId((current) => current || String(data[0]._id));
       } catch (e) {
         setErr(e?.response?.data?.error || e?.message || '加载班级失败');
       }
     })();
   }, []);
 
-  const fetchBoard = async () => {
+  const fetchBoard = useCallback(async () => {
     if (!classId) return;
     setLoading(true);
     setErr('');
@@ -32,9 +33,12 @@ export default function TeacherAnalytics() {
     } catch (e) {
       setErr(e?.response?.data?.error || e?.message || '获取数据看板失败');
     } finally { setLoading(false); }
-  };
+  }, [classId]);
 
-  useEffect(() => { fetchBoard(); /* eslint-disable-next-line */ }, [classId]);
+  useEffect(() => { fetchBoard(); }, [fetchBoard]);
+
+  const hasCompletionData = board?.hasCompletionData ?? ((board?.membersCount ?? 0) > 0 && (board?.assignmentsCount ?? 0) > 0);
+  const hasScoreData = board?.hasScoreData ?? ((board?.gradedCount ?? 0) > 0);
 
   return (
     <div className="page">
@@ -46,7 +50,7 @@ export default function TeacherAnalytics() {
               <option key={c._id} value={c._id}>{c.name}</option>
             ))}
           </select>
-          <a className="btn" href={classId?`/teacher/classes/${classId}`:'#'} style={{ textDecoration:'none' }}>前往班级</a>
+          {classId && <Link className="btn" to={`/teacher/classes/${classId}`}>前往班级</Link>}
         </div>
 
         {err && <div className="note" style={{ color:'#e03131', marginBottom:8 }}>{err}</div>}
@@ -55,25 +59,27 @@ export default function TeacherAnalytics() {
             <div className="card">
               <div className="card-head"><span>核心指标</span></div>
               {board ? (
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12 }}>
-                  <div className="card"><div className="card-head"><span>成员数</span></div><div style={{ fontSize:28, fontWeight:800 }}>{board.membersCount}</div></div>
-                  <div className="card"><div className="card-head"><span>作业数</span></div><div style={{ fontSize:28, fontWeight:800 }}>{board.assignmentsCount}</div></div>
-                  <div className="card"><div className="card-head"><span>完成率</span></div><div style={{ fontSize:28, fontWeight:800 }}>{(board.completionRate*100).toFixed(0)}%</div></div>
-                  <div className="card"><div className="card-head"><span>平均分</span></div><div style={{ fontSize:28, fontWeight:800 }}>{board.averageScore}</div></div>
+                <div className="analytics-metrics">
+                  <div className="metric"><span>成员数</span><strong>{board.membersCount ?? 0}</strong></div>
+                  <div className="metric"><span>作业数</span><strong>{board.assignmentsCount ?? 0}</strong></div>
+                  <div className="metric"><span>完成率</span><strong>{hasCompletionData ? `${((board.completionRate ?? 0) * 100).toFixed(0)}%` : '暂无数据'}</strong></div>
+                  <div className="metric"><span>平均分</span><strong>{hasScoreData ? board.averageScore : '暂无数据'}</strong></div>
                 </div>
               ) : (
-                <div>暂无数据</div>
+                <div className="analytics-empty">请选择已有班级查看教学数据。</div>
               )}
             </div>
 
             <div className="card">
               <div className="card-head"><span>常见错误</span></div>
               {board && (board.commonMistakes || []).length ? (
-                <ul style={{ margin:0, paddingLeft:16 }}>
+                <ul className="mistake-list">
                   {board.commonMistakes.map((x,i)=>(<li key={i}>{x}</li>))}
                 </ul>
               ) : (
-                <div>暂无</div>
+                <div className="analytics-empty">
+                  {board?.assignmentsCount ? '当前反馈中尚未识别到可汇总的错误类型。' : '发布作业并完成批改后，这里会汇总高频问题。'}
+                </div>
               )}
             </div>
           </div>
@@ -82,4 +88,3 @@ export default function TeacherAnalytics() {
     </div>
   );
 }
-

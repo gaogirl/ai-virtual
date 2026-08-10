@@ -52,3 +52,7 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+
+# Local demo database and downloaded MongoDB runtime
+backend/.demo-data/
+backend/.demo-mongodb-binaries/

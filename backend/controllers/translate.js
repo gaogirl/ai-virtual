@@ -6,6 +6,9 @@ exports.handleTranslate = async (req, res) => {
   if (!text || !targetLang) {
     return res.status(400).json({ error: 'text 与 targetLang 为必填参数' });
   }
+  if (!process.env.ZHIPU_API_KEY) {
+    return res.status(503).json({ error: 'AI service is not configured' });
+  }
 
   const useStream = stream !== false; // 默认流式
 
@@ -18,7 +21,7 @@ exports.handleTranslate = async (req, res) => {
   ];
 
   const reqBody = {
-    model: model || 'glm-4.5',
+    model: ['glm-4.5', 'glm-4.5-flash'].includes(model) ? model : 'glm-4.5',
     messages,
     stream: useStream,
     temperature: typeof temperature === 'number' ? temperature : 0.2,
@@ -71,5 +74,4 @@ exports.handleTranslate = async (req, res) => {
     }
   }
 };
-
 

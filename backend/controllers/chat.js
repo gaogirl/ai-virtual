@@ -3,16 +3,20 @@ const axios = require('axios');
 exports.handleChat = async (req, res) => {
     const { messages, model, stream, temperature, max_tokens, thinking } = req.body || {};
 
-    if (!messages) {
+    if (!Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({ error: 'Messages are required' });
+    }
+    if (!process.env.ZHIPU_API_KEY) {
+        return res.status(503).json({ error: 'AI service is not configured' });
     }
 
     const useStream = stream !== false; // 默认开启流式
+    const allowedModels = new Set(['glm-4.5', 'glm-4.5-flash']);
     const reqBody = {
-        model: model || 'glm-4.5-flash',
+        model: allowedModels.has(model) ? model : 'glm-4.5-flash',
         messages,
         stream: useStream,
-        max_tokens: max_tokens || 1024,
+        max_tokens: Math.min(Math.max(Number(max_tokens) || 1024, 64), 2048),
         temperature: typeof temperature === 'number' ? temperature : 0.6,
     };
     if (thinking && thinking.type === 'enabled') {
@@ -74,5 +78,4 @@ exports.handleChat = async (req, res) => {
         }
     }
 };
-
 

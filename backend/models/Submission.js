@@ -16,9 +16,9 @@ const SubmissionSchema = new Schema({
   answers: { type: [AnswerItemSchema], default: [] },
   totalScore: { type: Number },
   comment: { type: String },
+  attempts: { type: Number, default: 0 },
 }, { timestamps: true, indexes: [{ fields: { assignment: 1, student: 1 }, options: { unique: true } }] });
 
 SubmissionSchema.index({ assignment: 1, student: 1 }, { unique: true });
 
 module.exports = mongoose.model('submissions', SubmissionSchema);
-
