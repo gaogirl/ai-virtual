@@ -1,0 +1,310 @@
+.login-container {
+  display: grid;
+  min-height: 100vh;
+  padding: clamp(16px, 4vw, 48px);
+  place-items: center;
+  background: #f4f7fb;
+}
+
+.login-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  min-width: 0;
+  width: min(100%, 1080px);
+  min-height: min(680px, calc(100vh - 64px));
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #dce5f0;
+  border-radius: 24px;
+  box-shadow: 0 24px 64px rgba(20, 35, 58, 0.12);
+}
+
+.login-left {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: clamp(32px, 6vw, 72px);
+  overflow: hidden;
+  color: #fff;
+  background: #14233a;
+}
+
+.login-left::before,
+.login-left::after {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  content: '';
+}
+
+.login-left::before {
+  width: 430px;
+  height: 430px;
+  top: -210px;
+  right: -190px;
+}
+
+.login-left::after {
+  width: 300px;
+  height: 300px;
+  bottom: -160px;
+  left: -125px;
+  background: rgba(15, 159, 143, 0.18);
+}
+
+.login-welcome {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.login-welcome::before {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  margin-bottom: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  color: #c9f5ee;
+  content: 'AI LEARNING WORKSPACE';
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+}
+
+.login-welcome h1 {
+  max-width: 410px;
+  margin: 0 0 16px;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.login-welcome p {
+  max-width: 390px;
+  margin: 0 0 42px;
+  color: #b7c5d9;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.login-left .welcome-features {
+  display: grid;
+  gap: 12px;
+  max-width: 370px;
+}
+
+.login-left .feature-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #eaf2ff;
+}
+
+.login-left .feature-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(15, 159, 143, 0.22);
+  font-size: 18px;
+}
+
+.login-left .feature-item span:last-child {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-right {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(28px, 5vw, 64px);
+  background: #fff;
+}
+
+.login-box {
+  width: min(100%, 390px);
+}
+
+.login-box h2 {
+  margin: 0 0 10px;
+  color: #14233a;
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.login-box h2::after {
+  display: block;
+  margin-top: 10px;
+  color: #627187;
+  content: '进入你的个性化教学工作台';
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.login-box .input-group {
+  margin: 22px 0 0;
+}
+
+.login-box .input-group + .input-group {
+  margin-top: 14px;
+}
+
+.login-box .input-group input {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid #dce5f0;
+  border-radius: 10px;
+  color: #14233a;
+  background: #f9fbfd;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.login-box .input-group input::placeholder {
+  color: #8c9aae;
+}
+
+.login-box .input-group input:focus {
+  border-color: #2563eb;
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.login-box .input-group input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.login-box .submit-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 22px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: #2563eb;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.login-box .submit-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(37, 99, 235, 0.28);
+}
+
+.login-box .submit-btn:disabled {
+  cursor: not-allowed;
+  background: #91a4bd;
+  box-shadow: none;
+}
+
+.login-box .sub-text {
+  margin: 22px 0 0;
+  color: #627187;
+  text-align: center;
+  font-size: 14px;
+}
+
+.login-box .sub-text a {
+  margin-left: 4px;
+  color: #0f9f8f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-box .sub-text a:hover {
+  text-decoration: underline;
+}
+
+.login-box .error-message {
+  margin: 20px 0 -2px;
+  padding: 11px 13px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #b42318;
+  background: #fff5f5;
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .login-container {
+    display: block;
+    min-height: 100dvh;
+    padding: 0;
+  }
+
+  .login-content {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .login-left {
+    min-height: 290px;
+    padding: 34px 24px;
+  }
+
+  .login-welcome::before {
+    margin-bottom: 20px;
+  }
+
+  .login-welcome h1 {
+    font-size: 34px;
+    overflow-wrap: anywhere;
+  }
+
+  .login-welcome p {
+    margin-bottom: 24px;
+  }
+
+  .login-left .welcome-features {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: none;
+  }
+
+  .login-left .feature-item {
+    min-width: 0;
+    padding: 10px;
+    gap: 8px;
+    overflow-wrap: anywhere;
+  }
+
+  .login-left .feature-item span:last-child {
+    font-size: 12px;
+  }
+
+  .login-right {
+    padding: 38px 24px 48px;
+  }
+}
+
+@media (max-width: 430px) {
+  .login-left {
+    min-height: 0;
+  }
+
+  .login-left .welcome-features {
+    grid-template-columns: 1fr;
+  }
+
+  .login-left .feature-item {
+    padding: 9px 11px;
+  }
+}
