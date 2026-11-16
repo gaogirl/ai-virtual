@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const RAW = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const API_URL = (RAW.endsWith('/api') || RAW.endsWith('/api/')) ? RAW.replace(/\/$/, '') : (RAW.replace(/\/$/, '') + '/api');
+const RAW = (import.meta.env.VITE_API_URL || '/api').replace(/\/+$/, '');
+export const API_URL = RAW.endsWith('/api') ? RAW : `${RAW}/api`;
 
 // 创建axios实例
 const api = axios.create({
@@ -42,7 +42,7 @@ api.interceptors.response.use(
       // token过期或无效，清除本地存储并跳转到登录页
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      window.location.assign(`${import.meta.env.BASE_URL}#/login`);
     }
     return Promise.reject(error);
   }

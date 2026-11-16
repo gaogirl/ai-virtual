@@ -1,5 +1,5 @@
 // AI 对话与翻译前端封装（使用后端代理，避免暴露密钥）
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+import { API_URL as API_BASE } from './api';
 
 const requestHeaders = () => {
   const token = localStorage.getItem('token');
@@ -43,8 +43,9 @@ async function streamSSE(url, data, onDelta) {
 
         try {
           const data = JSON.parse(dataStr);
-          if (data.choices?.[0]?.delta) {
-            onDelta(data.choices[0].delta);
+          const content = data.choices?.[0]?.delta?.content;
+          if (typeof content === 'string') {
+            onDelta(content);
           }
         } catch (e) {
           console.warn('Failed to parse SSE data:', e);

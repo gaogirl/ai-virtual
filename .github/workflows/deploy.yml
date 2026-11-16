@@ -1,6 +1,7 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
   pull_request:
@@ -8,6 +9,7 @@ on:
 
 jobs:
   deploy:
+    if: vars.VITE_API_URL != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,14 +19,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           
       - name: Install dependencies
-        run: npm install
+        run: npm ci
         working-directory: ./frontend
           
       - name: Build frontend
-        run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          node -e "const url = new URL(process.env.VITE_API_URL); if (url.protocol !== 'https:') throw new Error('VITE_API_URL must use HTTPS');"
+          npm run build
         working-directory: ./frontend
           
       - name: Deploy to GitHub Pages

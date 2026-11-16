@@ -77,15 +77,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('local_users', JSON.stringify(users));
   };
 
-  const useLocalAuth = () => {
+  const isLocalAuthEnabled = () => {
     const flag = import.meta?.env?.VITE_LOCAL_AUTH;
     return flag === 'true' || flag === true; // 允许通过环境变量强制本地模式
   };
 
-  // 注册（带本地存储兜底）
   const register = async (userData) => {
     // 若显式启用本地模式，直接走本地
-    if (useLocalAuth()) {
+    if (isLocalAuthEnabled()) {
       return localRegister(userData);
     }
 
@@ -100,15 +99,17 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         return { success: true, user: userInfo };
       }
-      // 远端未返回有效数据，则本地兜底
-      return localRegister(userData, new Error('远端注册返回无效数据'));
+      return { success: false, message: '注册失败，服务端未返回有效的账户信息' };
     } catch (error) {
-      // 远端失败则尝试本地注册兜底
-      return localRegister(userData, error);
+      return {
+        success: false,
+        message: error.response?.data?.message || error.response?.data?.msg ||
+          (error.response ? '注册失败，请稍后重试' : '无法连接服务器，请稍后重试'),
+      };
     }
   };
 
-  const localRegister = async (userData, remoteError) => {
+  const localRegister = async (userData) => {
     const { name, email, password, role = 'student' } = userData;
     const users = getLocalUsers();
     if (users.some(u => u.email === email)) {
@@ -129,14 +130,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(newUser));
     setUser(newUser);
     setIsAuthenticated(true);
-    const msg = remoteError ? '后端不可用，已切换到本地注册成功' : undefined;
-    return { success: true, user: newUser, message: msg };
+    return { success: true, user: newUser };
   };
 
-  // 登录（带本地存储兜底）
   const login = async (credentials) => {
     // 若显式启用本地模式，直接走本地
-    if (useLocalAuth()) {
+    if (isLocalAuthEnabled()) {
       return localLogin(credentials);
     }
 
@@ -151,10 +150,8 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true, user: userInfo };
     } catch (error) {
-      // 远端失败则尝试本地登录兜底
-      const localRes = await localLogin(credentials);
-      if (localRes.success) return localRes;
-      const message = error.response?.data?.message || error.response?.data?.msg || '登录失败，请检查邮箱和密码';
+      const message = error.response?.data?.message || error.response?.data?.msg ||
+        (error.response ? '登录失败，请检查邮箱和密码' : '无法连接服务器，请稍后重试');
       return { success: false, message };
     }
   };
